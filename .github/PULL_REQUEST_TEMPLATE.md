@@ -1,10 +1,15 @@
-Fixes #<issue_number_goes_here>
+## Summary
 
-> It's a good idea to open an issue first for discussion.
+Describe the behavior change and the problem it addresses.
 
-**Description**
-A brief summary of what this PR does and why.
+## Validation
 
-- [ ] Tests pass
-- [ ] README updated if needed
-- [ ] No breaking changes (or described below)
+- [ ] `go test ./...`
+- [ ] `go vet ./...`
+- [ ] Relevant PostgreSQL/MinIO integration checks
+
+Checks not run:
+
+## Compatibility and security impact
+
+Describe API, schema, archive-format, configuration, tenant-isolation, or operational effects. Write “None” when there is no impact.

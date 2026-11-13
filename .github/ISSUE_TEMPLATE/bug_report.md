@@ -1,26 +1,28 @@
 ---
 name: Bug report
-about: Create a report to help us improve
-title: ''
+about: Report a reproducible defect in Customer Data Export
+title: ""
 labels: bug
-assignees: ''
+assignees: ""
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+## Summary
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. See error
+Describe the observed problem.
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+## Steps to reproduce
 
-**Environment**
-- OS: [e.g. macOS 26.4.1, Windows 11, Ubuntu 24.04.4]
-- Version: [e.g. 1.0.0]
+Include the command, API request, or local setup needed to reproduce it. Redact tokens, credentials, tenant data, and attachment contents.
 
-**Additional context**
-Add any other context or screenshots here.
+## Expected and actual behavior
+
+## Environment
+
+- Project version or commit:
+- Go version:
+- Operating system:
+- PostgreSQL/MinIO versions, if relevant:
+
+## Logs
+
+Include relevant redacted error output.
