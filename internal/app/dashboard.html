@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Export Console</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #101513;
+        --panel: #171e1b;
+        --line: #29332e;
+        --muted: #9aa69e;
+        --text: #edf3ee;
+        --accent: #b7f36b;
+        --red: #ff8d7a
+      }
+
+      * {
+        box-sizing: border-box
+      }
+
+      body {
+        margin: 0;
+        background: radial-gradient(ellipse at 70% -15%, #293d2f 0, transparent 42%), var(--bg);
+        color: var(--text);
+        font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, sans-serif
+      }
+
+      .wrap {
+        max-width: 1080px;
+        margin: auto;
+        padding: 48px 26px
+      }
+
+      .top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 48px
+      }
+
+      .brand {
+        font-weight: 700;
+        letter-spacing: .02em
+      }
+
+      .badge {
+        color: var(--accent);
+        border: 1px solid #506538;
+        border-radius: 99px;
+        padding: 5px 11px;
+        font-size: 12px
+      }
+
+      .eyebrow {
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: .17em;
+        font-size: 11px;
+        font-weight: 700
+      }
+
+      h1 {
+        font-size: clamp(34px, 6vw, 58px);
+        line-height: 1.03;
+        letter-spacing: -.045em;
+        max-width: 670px;
+        margin: 12px 0 18px
+      }
+
+      .intro {
+        color: var(--muted);
+        max-width: 600px
+      }
+
+      .panel {
+        background: linear-gradient(145deg, #1b2420, #141a17);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 24px;
+        margin-top: 32px
+      }
+
+      .row {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap
+      }
+
+      .token {
+        flex: 1;
+        min-width: 260px
+      }
+
+      input {
+        background: #0e1311;
+        color: var(--text);
+        border: 1px solid #39463e;
+        border-radius: 8px;
+        padding: 12px;
+        width: 100%;
+        font: inherit
+      }
+
+      button,
+      .button {
+        border: 0;
+        border-radius: 8px;
+        background: var(--accent);
+        color: #16200f;
+        padding: 11px 15px;
+        font: 700 13px ui-sans-serif, system-ui, sans-serif;
+        cursor: pointer;
+        text-decoration: none
+      }
+
+      button.secondary {
+        background: #27322b;
+        color: var(--text);
+        border: 1px solid #3a473e
+      }
+
+      button:disabled {
+        opacity: .5;
+        cursor: wait
+      }
+
+      .hint {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 9px
+      }
+
+      .section-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 14px
+      }
+
+      .section-head h2 {
+        font-size: 16px;
+        margin: 0
+      }
+
+      .grid {
+        display: block
+      }
+
+      .job {
+        display: grid;
+        grid-template-columns: 1fr auto auto auto auto;
+        gap: 0 18px
+      }
+
+      .cell {
+        padding: 14px 0;
+        border-top: 1px solid var(--line);
+        font-size: 13px
+      }
+
+      .muted {
+        color: var(--muted)
+      }
+
+      .status {
+        color: var(--accent);
+        font-weight: 700
+      }
+
+      .error {
+        color: var(--red);
+        min-height: 24px;
+        margin-top: 12px
+      }
+
+      .empty {
+        padding: 25px 0;
+        color: var(--muted);
+        border-top: 1px solid var(--line)
+      }
+
+      @media(max-width:700px) {
+        .job {
+          grid-template-columns: 1fr auto
+        }
+
+        .job .hide-small {
+          display: none
+        }
+
+        .top {
+          margin-bottom: 32px
+        }
+
+        .wrap {
+          padding: 28px 17px
+        }
+
+        .panel {
+          padding: 17px
+        }
+      }
+
+    </style>
+  </head>
+
+  <body>
+    <main class="wrap">
+      <header class="top">
+        <div class="brand">PORTABILITY / EXPORTS</div>
+        <div class="badge">PRIVATE BY TENANT</div>
+      </header>
+      <div class="eyebrow">Customer data export</div>
+      <h1>Your records, packaged and checked.</h1>
+      <p class="intro">Request an export of your tenant’s declared datasets and attachments. The worker validates the
+        archive before it becomes available.</p>
+      <section class="panel">
+        <div class="section-head">
+          <h2>Administrator session</h2><span class="muted">JWT stays in this browser tab</span>
+        </div>
+        <div class="row">
+          <div class="token"><input id="token" type="password" autocomplete="off"
+              placeholder="Paste a tenant administrator bearer token"></div><button class="secondary" id="refresh">Load
+            exports</button><button id="request">Request export</button>
+        </div>
+        <div class="hint">Local demo token: <code>go run ./cmd/exportctl token USER_ID TENANT_ID</code></div>
+        <div class="error" id="error" role="status"></div>
+      </section>
+      <section class="panel">
+        <div class="section-head">
+          <h2>Export jobs</h2><span class="muted" id="count">—</span>
+        </div>
+        <div class="grid" id="jobs">
+          <div class="empty">Authenticate as a tenant administrator to load live export jobs.</div>
+        </div>
+      </section>
+    </main>
+    <script>
+      const token = document.querySelector('#token'), jobs = document.querySelector('#jobs'), error = document.querySelector('#error'), count = document.querySelector('#count');
+      async function api(path, options = {}) { const response = await fetch(path, { ...options, headers: { Authorization: `Bearer ${token.value}`, ...options.headers } }); if (!response.ok) throw new Error(response.status === 403 ? 'Administrator role required' : response.status === 401 ? 'Token is missing or invalid' : `Request failed (${response.status})`); if (response.status === 204) return null; return response.json() }
+      function cell(value, cls = '') { const el = document.createElement('div'); el.className = `cell ${cls}`; el.textContent = value; return el }
+      async function load() { error.textContent = ''; try { const list = await api('/api/v1/exports'); jobs.replaceChildren(); count.textContent = `${list.length} shown`; if (!list.length) { jobs.append(cell('No exports yet. Request one to start.', 'empty')); return } for (const item of list) { const row = document.createElement('div'); row.className = 'job'; row.append(cell(item.id), cell(item.status, 'status'), cell(`${item.record_count} records`, 'hide-small'), cell(item.phase, 'muted hide-small')); if (item.status === 'available') { const action = document.createElement('div'); action.className = 'cell'; const b = document.createElement('button'); b.textContent = 'Download'; b.onclick = async () => { try { const r = await api(`/api/v1/exports/${item.id}/download`, { headers: { Accept: 'application/json' } }); window.location.assign(r.url) } catch (e) { error.textContent = e.message } }; action.append(b); row.append(action) } else { row.append(cell('')) } jobs.append(row) } } catch (e) { error.textContent = e.message } }
+      document.querySelector('#refresh').onclick = load; document.querySelector('#request').onclick = async () => { error.textContent = ''; try { await api('/api/v1/exports', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ format: 'zip', datasets: ['all'] }) }); await load() } catch (e) { error.textContent = e.message } };
+    </script>
+  </body>
+
+</html>
