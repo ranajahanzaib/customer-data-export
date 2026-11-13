@@ -1,33 +1,28 @@
-name: CI
-
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-
+name: ci
+on: [push, pull_request]
+permissions:
+  contents: read
 jobs:
-  build:
+  go:
     runs-on: ubuntu-latest
-
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-go@v5
         with:
-          node-version: 20
-
-      # Uncomment and adjust the steps below to match your project's setup
-
-      # - name: Install dependencies
-      #   run: npm ci
-
-      # - name: Lint
-      #   run: npm run lint
-
-      # - name: Run tests
-      #   run: npm test
-
-      # - name: Build
-      #   run: npm run build
+          go-version-file: go.mod
+          cache: true
+      - run: test -z "$(gofmt -l cmd internal)"
+      - run: go vet ./...
+      - run: go test -race ./...
+      - run: go build ./cmd/api ./cmd/worker ./cmd/exportctl
+      - run: cp .env.example .env && docker compose up -d postgres minio && docker compose run --rm minio-init
+      - run: make migrate seed
+        env:
+          DATABASE_URL: postgres://export:export_dev_only@localhost:5432/customer_export?sslmode=disable
+      - run: go test ./tests/integration/...
+        env:
+          RUN_INTEGRATION: "1"
+          DATABASE_URL: postgres://export:export_dev_only@localhost:5432/customer_export?sslmode=disable
+      - if: always()
+        run: docker compose down
