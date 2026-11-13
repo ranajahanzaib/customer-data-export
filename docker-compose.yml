@@ -24,13 +24,13 @@ services:
       test:
         [
           "CMD-SHELL",
-          "curl -f http://127.0.0.1:9000/minio/health/live || exit 1",
+          "MC_HOST_local=http://localminio:localminio_secret@127.0.0.1:9000 mc ready local",
         ]
       interval: 5s
       timeout: 5s
       retries: 20
   minio-init:
-    image: cgr.dev/chainguard/minio-client:latest
+    image: coollabsio/minio:RELEASE.2025-10-15T17-29-55Z
     depends_on:
       minio: { condition: service_healthy }
     volumes: ["./fixtures:/seed:ro"]
